@@ -2,18 +2,15 @@
 #include <fstream>
 #include <cmath>
 #include <cstdlib>
-#include <ctime>
 #include <vector>
 #define N 3 
 class RadNeuro {
 	private:
 		double nu, n, lambda, drob;
-		double Ci[N];
 		double C1, C2, sigma;
 		std::vector<double> vx1, vx2, v;
 	public:
 		RadNeuro(){
-			srand(time(NULL));
 			nu = 0.08;
 			n = 0.5;
 			lambda = 1;
@@ -31,7 +28,7 @@ class RadNeuro {
 			}
 			for(int p = 1; p < v.size(); ++p)
 				calculate(out, p);
-			std::cout << calcValue(6, 5.5) << std::endl;
+			std::cout << calcValue(4, 8) << std::endl;
 		}
 		double calcValue(double x1, double x2){
 			return exp( - (pow (x1 - C1, 2) + pow(x2 - C2, 2))/ ( 2 * pow(sigma, 2)));
@@ -70,18 +67,13 @@ class RadNeuro {
 		}
 		void calculate(std::ofstream& out, int p){
 			double gC1, gC2, gS, C1r, C2r, Sr, C1r1, C2r1, Sr1, Er, Er1, gLength;
-			double sum1 = 0, sum2 = 0;
-			for(int i = 0; i < p; i++){
-				sum1 += vx1[p];
-				sum2 += vx2[p];
-			}
 			while(1){
-				gC1 = gradC1(p, C1, C2, sigma);
-				gC2 = gradC2(p, C1, C2, sigma);
-				gS = gradS(p, C1, C2, sigma);
 				C1r = C1;
 				C2r = C2;
 				Sr = sigma;
+				gC1 = gradC1(p, C1r, C2r, Sr);
+				gC2 = gradC2(p, C1r, C2r, Sr);
+				gS = gradS(p, C1r, C2r, Sr);
 				gLength = sqrt(pow(gC1, 2) + pow(gC2, 2) + pow(gS, 2));
 				C1r1 = C1r - lambda * gC1/gLength;
 				C2r1 = C2r - lambda * gC2/gLength;
@@ -96,6 +88,8 @@ class RadNeuro {
 				if(fabs(Er - Er1) < 0.0000001)
 					break;
 			}
+			C1 += nu * (vx1[p] - C1);
+			C2 += nu * (vx2[p] - C2);
 			std::cout << C1 << " " << C2 << " " << sigma << " " << vx1[p] << " " << vx2[p] << " " << v[p] << std::endl;
 			writeToPlot(out, C1, C2, sigma);
 			C1 = C2 = sigma;
