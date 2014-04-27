@@ -18,10 +18,6 @@ class RadNeuro {
 			n = 0.5;
 			lambda = 1;
 			drob = 0.7;
-			/*for(int i = 0; i < N; ++i){
-				Ci[i] =  1.0/((double)(rand()%10) + 2)+1.0/((double)(rand()%10) + 2);
-			}
-			Ci[2] = 5;*/
 			C1 = C2 = 1;
 			sigma = 1;
 		}
@@ -35,8 +31,11 @@ class RadNeuro {
 			}
 			for(int p = 1; p < v.size(); ++p)
 				calculate(out, p);
+			std::cout << calcValue(6, 5.5) << std::endl;
 		}
-
+		double calcValue(double x1, double x2){
+			return exp( - (pow (x1 - C1, 2) + pow(x2 - C2, 2))/ ( 2 * pow(sigma, 2)));
+		}
 		double functionValue(int p, double c1, double c2, double s){
 			double result = 0;
 			for(int i = 0; i < p; i++){
@@ -71,6 +70,11 @@ class RadNeuro {
 		}
 		void calculate(std::ofstream& out, int p){
 			double gC1, gC2, gS, C1r, C2r, Sr, C1r1, C2r1, Sr1, Er, Er1, gLength;
+			double sum1 = 0, sum2 = 0;
+			for(int i = 0; i < p; i++){
+				sum1 += vx1[p];
+				sum2 += vx2[p];
+			}
 			while(1){
 				gC1 = gradC1(p, C1, C2, sigma);
 				gC2 = gradC2(p, C1, C2, sigma);
